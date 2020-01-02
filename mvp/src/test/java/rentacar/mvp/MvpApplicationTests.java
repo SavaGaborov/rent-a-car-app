@@ -1,10 +1,10 @@
-package mvp.rent.a.car;
+package rentacar.mvp;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ApplicationTests {
+class MvpApplicationTests {
 
 	@Test
 	void contextLoads() {
