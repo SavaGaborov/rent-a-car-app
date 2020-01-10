@@ -1,8 +1,10 @@
-CREATE TABLE users (
-  id bigint(20) NOT NULL AUTO_INCREMENT,
-  username varchar(100) NOT NULL,
-  first_name varchar(50) NOT NULL,
-  last_name varchar(50) DEFAULT NULL,
-  PRIMARY KEY (id),
-  UNIQUE KEY UK_username (username)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE IF NOT EXISTS Users
+(
+    id INT auto_increment NOT NULL PRIMARY KEY,
+    created_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted BOOLEAN NOT NULL,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100)
+);
+
