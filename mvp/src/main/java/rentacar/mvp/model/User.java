@@ -2,28 +2,35 @@ package rentacar.mvp.model;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 /**
  * Created by savagaborov on 8.1.20..
  */
 @Entity
-@Table(name = "Users")
+@Table(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 @Builder
 public class User extends BaseModel {
 
-    @NotNull
     @Column(name = "first_name")
     private String firstName;
 
-    @NotNull
     @Column(name = "last_name")
     private String lastName;
+
+    @NotNull
+    @Column(name = "email")
+    private String email;
+
+    @NotNull
+    @Column(name = "password")
+    private String password;
+
+    @NotNull
+    @Column(name = "phone_number")
+    private String phoneNumber;
 }

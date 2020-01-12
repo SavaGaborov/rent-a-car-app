@@ -1,12 +1,12 @@
-package rentacar.mvp.controller;
+package rentacar.mvp.controller.borrower;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Created by savagaborov on 8.1.2020
+ * Created by savagaborov on 12.1.2020
  */
 @RestController
-@RequestMapping("/users")
-public class UserController {
+@RequestMapping("/borrowers")
+public class BorrowerController {
 }
