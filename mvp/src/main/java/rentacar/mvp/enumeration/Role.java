@@ -5,5 +5,5 @@ package rentacar.mvp.enumeration;
  */
 public enum Role {
 
-    ADMIN, BORROWER
+    SUPER_ADMIN, ADMIN, BORROWER
 }

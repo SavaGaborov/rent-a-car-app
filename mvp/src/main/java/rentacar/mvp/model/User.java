@@ -1,6 +1,7 @@
 package rentacar.mvp.model;
 
 import lombok.*;
+import rentacar.mvp.enumeration.Role;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -29,6 +30,11 @@ public class User extends BaseModel {
     @NotNull
     @Column(name = "password")
     private String password;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private Role role;
 
     @NotNull
     @Column(name = "phone_number")
