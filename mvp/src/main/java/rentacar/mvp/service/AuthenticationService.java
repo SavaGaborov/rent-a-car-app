@@ -70,11 +70,11 @@ public class AuthenticationService {
         log.info("START signIn()");
 
         Optional<User> user = userRepository.getUserByEmailAndDeletedIsFalse(request.getEmail());
-        if (user.isPresent()) {
+        if (!user.isPresent()) {
             throw new Exception("The user does not exist");
         }
 
-        if(passwordEncoder.matches(request.getPassword(), user.get().getPassword())) {
+        if(!passwordEncoder.matches(request.getPassword(), user.get().getPassword())) {
             throw new Exception("Old password is not correct");
         }
 

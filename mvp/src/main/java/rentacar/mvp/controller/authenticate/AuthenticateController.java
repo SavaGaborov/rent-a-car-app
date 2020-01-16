@@ -2,6 +2,7 @@ package rentacar.mvp.controller.authenticate;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import rentacar.mvp.controller.authenticate.request.ChangePasswordRequest;
 import rentacar.mvp.controller.authenticate.request.CreateAdminRequest;
@@ -37,7 +38,7 @@ public class AuthenticateController {
 
     @PostMapping (value="/admin/register")
     @ResponseStatus(HttpStatus.CREATED)
-    //TODO super admin permission
+    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     public void registerAdminUser(@RequestBody @Valid CreateAdminRequest request) throws Exception {
         authenticationService.registerAdminUser(request);
     }
@@ -50,7 +51,7 @@ public class AuthenticateController {
 
     @PostMapping (value="/change-password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    //TODO all roles
+    @PreAuthorize("hasAuthority('SUPER_ADMIN') or hasAuthority('ADMIN')")
     public void changePassword(@RequestBody @Valid ChangePasswordRequest request) throws Exception {
         authenticationService.changePassword(request);
     }

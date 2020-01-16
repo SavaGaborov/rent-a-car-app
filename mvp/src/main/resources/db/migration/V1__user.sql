@@ -8,7 +8,7 @@ CREATE TABLE users
     deleted BOOLEAN NOT NULL,
     first_name VARCHAR(100),
     last_name VARCHAR(100),
-    email VARCHAR(128),
+    email VARCHAR(128) UNIQUE,
     password VARCHAR(200),
     role VARCHAR(25),
     phone_number VARCHAR(50)

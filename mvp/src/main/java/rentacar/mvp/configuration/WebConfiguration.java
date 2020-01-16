@@ -26,7 +26,7 @@ public class WebConfiguration implements WebMvcConfigurer{
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        
+
         log.info("*** Initializing CORS filter ***");
 
         registry.addMapping("/**")
