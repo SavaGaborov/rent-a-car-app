@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import rentacar.mvp.configuration.security.JWTUtil;
 import rentacar.mvp.controller.authenticate.request.ChangePasswordRequest;
 import rentacar.mvp.controller.authenticate.request.CreateAdminRequest;
 import rentacar.mvp.controller.authenticate.request.SignInRequest;
@@ -77,8 +78,6 @@ public class AuthenticationService {
             throw new Exception("Old password is not correct");
         }
 
-        //TODO response (token and basic info)
-
         log.info("FINISH signIn()");
         return SignInResponse.builder()
                 .firstName(user.get().getFirstName())
@@ -86,8 +85,8 @@ public class AuthenticationService {
                 .email(user.get().getEmail())
                 .phoneNumber(user.get().getPhoneNumber())
                 .role(user.get().getRole())
-                .accessToken("/")
-                .refreshToken("/")
+                .accessToken(JWTUtil.generateAccessToken(user.get()))
+                .refreshToken(JWTUtil.generateRefreshToken(user.get()))
                 .build();
     }
 

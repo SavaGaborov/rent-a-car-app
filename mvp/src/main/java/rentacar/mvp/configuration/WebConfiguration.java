@@ -5,51 +5,33 @@ import org.slf4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 /**
  * Created by savagaborov on 8.1.2020
  */
 @Configuration
-@EnableWebMvc
-@ComponentScan
-public class WebConfiguration implements WebMvcConfigurer {
+public class WebConfiguration implements WebMvcConfigurer{
 
     private final Logger log = LoggerFactory.getLogger(WebConfiguration.class);
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public CorsFilter corsFilter() {
-
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        
         log.info("*** Initializing CORS filter ***");
 
-        final CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("GET");
-        config.addAllowedMethod("PUT");
-        config.addAllowedMethod("PATCH");
-        config.addAllowedMethod("POST");
-        config.addAllowedMethod("DELETE");
-        config.addAllowedMethod("OPTIONS");
-
-        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        source.registerCorsConfiguration("/api/**", config);
-        source.registerCorsConfiguration("**/swagger-ui.html", config);
-        source.registerCorsConfiguration("/v2/api-docs/**", config);
-
-        return new CorsFilter(source);
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:8080")
+                .allowedMethods("GET", "PUT", "POST", "DELETE", "OPTIONS");
     }
+
 }
