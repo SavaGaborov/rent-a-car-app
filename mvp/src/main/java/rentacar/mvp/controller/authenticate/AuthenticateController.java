@@ -26,7 +26,7 @@ public class AuthenticateController {
         this.authenticationService = authenticationService;
     }
 
-    @PostMapping (value="/super-admin/create/temporary")
+    @PostMapping (value="/add/super-admin/temporary")
     @ResponseStatus(HttpStatus.CREATED)
     public void createInitAdminUser(@RequestBody @Valid CreateAdminRequest request) {
         authenticationService.createInitAdminUser(request);
