@@ -1,13 +1,15 @@
 package rentacar.mvp.model;
 
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import rentacar.mvp.enumeration.Role;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.ZonedDateTime;
 
 /**
- * Created by savagaborov on 8.1.20..
+ * Created by savagaborov on 8.1.2020
  */
 @Entity
 @Table(name = "users")
@@ -39,4 +41,10 @@ public class User extends BaseModel {
     @NotNull
     @Column(name = "phone_number")
     private String phoneNumber;
+
+    @Column(name = "reset_password_code")
+    private String resetPasswordCode;
+
+    @Column(name = "reset_password_code_timestamp")
+    private ZonedDateTime resetPasswordCodeTimestamp;
 }

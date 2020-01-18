@@ -1,8 +1,8 @@
 package rentacar.mvp.enumeration;
 
 /**
- * Created by savagaborov on 12.1.20..
+ * Created by savagaborov on 12.1.2020
  */
 public enum Role {
-    UNAUTHORIZED, SUPER_ADMIN, ADMIN, BORROWER
+    SUPER_ADMIN, ADMIN, BORROWER
 }

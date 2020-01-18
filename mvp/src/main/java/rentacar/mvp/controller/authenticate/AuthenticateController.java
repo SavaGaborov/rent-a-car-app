@@ -6,6 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import rentacar.mvp.controller.authenticate.request.ChangePasswordRequest;
 import rentacar.mvp.controller.authenticate.request.CreateAdminRequest;
+import rentacar.mvp.controller.authenticate.request.ForgotPasswordRequest;
 import rentacar.mvp.controller.authenticate.request.SignInRequest;
 import rentacar.mvp.controller.authenticate.response.SignInResponse;
 import rentacar.mvp.service.AuthenticationService;
@@ -25,13 +26,8 @@ public class AuthenticateController {
         this.authenticationService = authenticationService;
     }
 
-    @GetMapping(value="/test", produces = MediaType.TEXT_PLAIN_VALUE)
-    public String index() {
-        return "This is TEST API";
-    }
-
     @PostMapping (value="/super-admin/create/temporary")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     public void createInitAdminUser(@RequestBody @Valid CreateAdminRequest request) {
         authenticationService.createInitAdminUser(request);
     }
@@ -51,8 +47,21 @@ public class AuthenticateController {
 
     @PostMapping (value="/change-password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAuthority('SUPER_ADMIN') or hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN') or hasAuthority('ADMIN') or hasAuthority('BORROWER')")
     public void changePassword(@RequestBody @Valid ChangePasswordRequest request) throws Exception {
         authenticationService.changePassword(request);
+    }
+
+    @PostMapping (value="/forgot-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) throws Exception {
+        authenticationService.forgotPassword(request);
+    }
+
+    @PostMapping (value="/reset-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAuthority('SUPER_ADMIN') or hasAuthority('ADMIN') or hasAuthority('BORROWER')")
+    public void resetPassword(@RequestParam String resetPasswordCode) throws Exception {
+        authenticationService.resetPassword(resetPasswordCode);
     }
 }

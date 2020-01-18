@@ -10,7 +10,7 @@ import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 /**
- * Created by savagaborov on 8.1.20..
+ * Created by savagaborov on 8.1.2020
  */
 @Getter
 @Setter

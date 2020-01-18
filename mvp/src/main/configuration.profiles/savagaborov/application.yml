@@ -6,3 +6,13 @@ spring:
   jpa:
     hibernate.ddl-auto: update
     properties.hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+  mail:
+    host: smtp.gmail.com
+    username: rentacarapplicationsupp@gmail.com
+    password: rentacar123
+    port: 587
+    protocol: smtp
+    ttls: true
+    properties.mail.smtp:
+      starttls.enable: true
+      ssl.trust: smtp.gmail.com
