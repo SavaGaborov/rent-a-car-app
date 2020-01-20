@@ -1,20 +1,22 @@
 package rentacar.mvp.service;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import net.bytebuddy.utility.RandomString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import rentacar.mvp.configuration.security.JWTFilter;
 import rentacar.mvp.configuration.security.JWTUtil;
-import rentacar.mvp.controller.authenticate.request.ChangePasswordRequest;
-import rentacar.mvp.controller.authenticate.request.CreateAdminRequest;
-import rentacar.mvp.controller.authenticate.request.ForgotPasswordRequest;
-import rentacar.mvp.controller.authenticate.request.SignInRequest;
+import rentacar.mvp.controller.authenticate.request.*;
+import rentacar.mvp.controller.authenticate.response.RefreshTokenResponse;
 import rentacar.mvp.controller.authenticate.response.SignInResponse;
+import rentacar.mvp.controller.exception.RentacarException;
+import rentacar.mvp.controller.staff.request.CreateStaffRequest;
 import rentacar.mvp.enumeration.Role;
 import rentacar.mvp.model.User;
 import rentacar.mvp.repository.jpa.UserRepository;
@@ -24,13 +26,15 @@ import javax.validation.Valid;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
-import static rentacar.mvp.util.mailUtil.sendEmail;
-
+import static rentacar.mvp.configuration.security.JWTUtil.*;
+import static rentacar.mvp.util.EmailUtil.sendEmail;
 /**
  * Created by savagaborov on 12.1.2020
  */
 @Service
 public class AuthenticationService {
+
+    private final Logger log = LoggerFactory.getLogger(AuthenticationService.class);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -44,10 +48,8 @@ public class AuthenticationService {
         this.env = env;
     }
 
-    private final Logger log = LoggerFactory.getLogger(AuthenticationService.class);
-
     @Transactional(rollbackFor = Exception.class)
-    public void createInitAdminUser(CreateAdminRequest request) {
+    public void createInitSuperAdminUser(CreateStaffRequest request) {
         User user = new User();
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
@@ -58,37 +60,16 @@ public class AuthenticationService {
         userRepository.save(user);
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public void registerAdminUser(CreateAdminRequest request) throws Exception {
-        log.info("START registerAdminUser()");
-
-        Optional<User> existingUser = userRepository.getUserByEmailAndDeletedIsFalse(request.getEmail());
-        if (existingUser.isPresent()) {
-            throw new Exception("The email address already registered");
-        }
-
-        User user = new User();
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(Role.ADMIN);
-        user.setPhoneNumber(request.getPhoneNumber());
-        userRepository.save(user);
-
-        log.info("FINISH registerAdminUser()");
-    }
-
     public SignInResponse signIn(SignInRequest request) throws Exception {
         log.info("START signIn()");
 
         Optional<User> user = userRepository.getUserByEmailAndDeletedIsFalse(request.getEmail());
         if (!user.isPresent()) {
-            throw new Exception("The user does not exist");
+            throw new RentacarException("user.not.exist");
         }
 
         if(!passwordEncoder.matches(request.getPassword(), user.get().getPassword())) {
-            throw new Exception("Old password is not correct");
+            throw new RentacarException("old.password.not.valid");
         }
 
         log.info("FINISH signIn()");
@@ -98,8 +79,8 @@ public class AuthenticationService {
                 .email(user.get().getEmail())
                 .phoneNumber(user.get().getPhoneNumber())
                 .role(user.get().getRole())
-                .accessToken(JWTUtil.generateAccessToken(user.get()))
-                .refreshToken(JWTUtil.generateRefreshToken(user.get()))
+                .accessToken(generateAccessToken(user.get()))
+                .refreshToken(generateRefreshToken(user.get()))
                 .build();
     }
 
@@ -108,11 +89,11 @@ public class AuthenticationService {
 
         Optional<User> user = userRepository.getUserByEmailAndDeletedIsFalse(request.getEmail());
         if (user.isPresent()) {
-            throw new Exception("The user does not exist");
+            throw new RentacarException("user.not.exist");
         }
 
         if(passwordEncoder.matches(request.getOldPassword(), user.get().getPassword())) {
-            throw new Exception("Old password is not correct");
+            throw new RentacarException("old.password.not.valid");
         }
 
         user.get().setPassword(passwordEncoder.encode(request.getNewPassword()));
@@ -126,7 +107,7 @@ public class AuthenticationService {
 
         Optional<User> user = userRepository.getUserByEmailAndDeletedIsFalse(request.getEmail());
         if (!user.isPresent()) {
-            throw new Exception("The user does not exist");
+            throw new RentacarException("user.not.exist");
         }
 
         user.get().setResetPasswordCode(RandomString.make(8));
@@ -134,12 +115,53 @@ public class AuthenticationService {
         userRepository.save(user.get());
 
         String subject = "Forgot password";
-        String body = "Reset your password by clicking on the link: http://localhost:4200/reset-password/" + user.get().getResetPasswordCode();
+        String body = "Reset your password by clicking on the link: http://localhost:8080/reset-password/" + user.get().getResetPasswordCode();
         sendEmail(request.getEmail(), subject, body);
 
         log.info("FINISH forgotPassword()");
     }
 
-    public void resetPassword(@Valid String resetPasswordCode) {
+    public void resetPassword(ResetPasswordRequest request, String resetPasswordCode) {
+        log.info("START resetPassword()");
+
+        Optional<User> user = userRepository.getUserByEmailAndDeletedIsFalse(request.getEmail());
+        if (!user.isPresent()) {
+            throw new RentacarException("user.not.exist");
+        }
+
+        if (!user.get().getResetPasswordCode().equals(resetPasswordCode) || user.get().getResetPasswordCodeTimestamp().plusHours(1).isAfter(ZonedDateTime.now())) {
+            throw new RentacarException("reset.password.code.not.valid");
+        }
+
+        user.get().setResetPasswordCode(null);
+        user.get().setResetPasswordCodeTimestamp(null);
+        user.get().setPassword(passwordEncoder.encode(request.getPassword()));
+        userRepository.save(user.get());
+
+        log.info("FINISH resetPassword()");
+    }
+
+    public RefreshTokenResponse refreshToken(String refreshToken) throws Exception {
+
+        String extractedRefreshToken = JWTFilter.extractRefreshToken(refreshToken);
+        final User user = getUserByJwt(extractedRefreshToken);
+        final String newAccessToken = generateAccessToken(user);
+        final String newRefreshToken = generateRefreshToken(user);
+
+        return new RefreshTokenResponse(user.getId(), newAccessToken, newRefreshToken, ACCESS_TOKEN_VALIDITY_IN_MINUTES);
+    }
+
+    private User getUserByJwt(String jwtToken) throws RentacarException {
+        try {
+            final Claims claims = Jwts.parser().setSigningKey(REFRESH_SECRET_KEY).parseClaimsJws(jwtToken).getBody();
+            Optional<User> user = userRepository.findById(Long.valueOf(claims.getSubject()));
+            if(user.isPresent()){
+                return user.get();
+            } else {
+                throw new RentacarException("general.exception", HttpStatus.CONFLICT);
+            }
+        } catch (Exception e) {
+            throw new RentacarException("invalid.token", HttpStatus.CONFLICT);
+        }
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
+import rentacar.mvp.controller.exception.RentacarException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -48,10 +49,10 @@ public class JWTFilter extends GenericFilterBean {
                     filterChain.doFilter(servletRequest, servletResponse);
                 } catch (SignatureException e1) {
                     log.debug("Authentication token is expired! - {}", e.getMessage());
-//                    returnUnauthorizedResponse(AUTHENTICATION_TOKEN_IS_EXPIRED, httpServletResponse, new ExceptionDataDTO(TOKEN_EXPIRED, null));
+                    throw new RentacarException("expired.token", HttpStatus.UNAUTHORIZED);
                 } catch (Exception e2) {
                     log.debug("Authentication token is invalid! - {}", e.getMessage());
-//                    returnUnauthorizedResponse(AUTHENTICATION_TOKEN_IS_INVALID, httpServletResponse, null);
+                    throw new RentacarException("invalid.token", HttpStatus.UNAUTHORIZED);
                 }
             }
         }
@@ -70,7 +71,7 @@ public class JWTFilter extends GenericFilterBean {
         if (refreshToken.startsWith(BEARER)) {
             return refreshToken.substring(BEARER.length(), refreshToken.length());
         }
-//        throw new Exception("invalid.token", HttpStatus.UNAUTHORIZED);
-        throw new Exception("invalid.token");
+        throw new RentacarException("invalid.token", HttpStatus.UNAUTHORIZED);
     }
+
 }

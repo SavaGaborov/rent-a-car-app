@@ -5,6 +5,9 @@ import lombok.Getter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+
+import static rentacar.mvp.util.ValidationUtil.PASSWORD_PATTERN;
 
 /**
  * Created by savagaborov on 18.1.2020

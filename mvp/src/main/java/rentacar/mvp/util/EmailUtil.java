@@ -8,7 +8,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 /**
  * Created by savagaborov on 20.1.2020
  */
-public class mailUtil {
+public class EmailUtil {
 
     @Autowired
     private static Environment env;

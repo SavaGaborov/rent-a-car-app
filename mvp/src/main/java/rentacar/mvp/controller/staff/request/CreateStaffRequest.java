@@ -1,4 +1,4 @@
-package rentacar.mvp.controller.authenticate.request;
+package rentacar.mvp.controller.staff.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -10,10 +10,16 @@ import javax.validation.constraints.Pattern;
 import static rentacar.mvp.util.ValidationUtil.PASSWORD_PATTERN;
 
 /**
- * Created by savagaborov on 14.1.20..
+ * Created by savagaborov on 12.1.2020
  */
 @Getter
-public class ChangePasswordRequest {
+public class CreateStaffRequest {
+
+    @JsonProperty("first_name")
+    private String firstName;
+
+    @JsonProperty("last_name")
+    private String lastName;
 
     @Email
     @NotBlank
@@ -21,12 +27,11 @@ public class ChangePasswordRequest {
     private String email;
 
     @NotBlank
-    @JsonProperty("old_password")
+    @JsonProperty("password")
     @Pattern(regexp = PASSWORD_PATTERN)
-    private String oldPassword;
+    private String password;
 
     @NotBlank
-    @JsonProperty("new_password")
-    @Pattern(regexp = PASSWORD_PATTERN)
-    private String newPassword;
+    @JsonProperty("phone_number")
+    private String phoneNumber;
 }

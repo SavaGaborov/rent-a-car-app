@@ -5,18 +5,15 @@ import lombok.Getter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+
+import static rentacar.mvp.util.ValidationUtil.PASSWORD_PATTERN;
 
 /**
- * Created by savagaborov on 12.1.2020
+ * Created by savagaborov on 20.1.2020
  */
 @Getter
-public class CreateAdminRequest {
-
-    @JsonProperty("first_name")
-    private String firstName;
-
-    @JsonProperty("last_name")
-    private String lastName;
+public class ResetPasswordRequest {
 
     @Email
     @NotBlank
@@ -25,9 +22,6 @@ public class CreateAdminRequest {
 
     @NotBlank
     @JsonProperty("password")
+    @Pattern(regexp = PASSWORD_PATTERN)
     private String password;
-
-    @NotBlank
-    @JsonProperty("phone_number")
-    private String phoneNumber;
 }

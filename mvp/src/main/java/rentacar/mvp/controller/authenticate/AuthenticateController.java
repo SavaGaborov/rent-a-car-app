@@ -1,14 +1,17 @@
 package rentacar.mvp.controller.authenticate;
 
+import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import rentacar.mvp.controller.authenticate.request.ChangePasswordRequest;
-import rentacar.mvp.controller.authenticate.request.CreateAdminRequest;
-import rentacar.mvp.controller.authenticate.request.ForgotPasswordRequest;
-import rentacar.mvp.controller.authenticate.request.SignInRequest;
+import rentacar.mvp.controller.authenticate.request.*;
+import rentacar.mvp.controller.authenticate.response.RefreshTokenResponse;
 import rentacar.mvp.controller.authenticate.response.SignInResponse;
+import rentacar.mvp.controller.staff.request.CreateStaffRequest;
 import rentacar.mvp.service.AuthenticationService;
 
 import javax.validation.Valid;
@@ -20,48 +23,55 @@ import javax.validation.Valid;
 @RequestMapping("/authentication")
 public class AuthenticateController {
 
+    private final Logger log = LoggerFactory.getLogger(AuthenticateController.class);
+
     private final AuthenticationService authenticationService;
 
     public AuthenticateController(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }
 
+    @ApiOperation("Initial create super admin user")
     @PostMapping (value="/add/super-admin/temporary")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createInitAdminUser(@RequestBody @Valid CreateAdminRequest request) {
-        authenticationService.createInitAdminUser(request);
+    public void createInitSuperAdminUser(@RequestBody @Valid CreateStaffRequest request) {
+        authenticationService.createInitSuperAdminUser(request);
     }
 
-    @PostMapping (value="/admin/register")
-    @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
-    public void registerAdminUser(@RequestBody @Valid CreateAdminRequest request) throws Exception {
-        authenticationService.registerAdminUser(request);
-    }
-
+    @ApiOperation("Sign in")
     @PostMapping (value="/sign-in")
     @ResponseStatus(HttpStatus.OK)
     public SignInResponse signIn(@RequestBody @Valid SignInRequest request) throws Exception {
         return authenticationService.signIn(request);
     }
 
+    @ApiOperation("Change user's password")
     @PostMapping (value="/change-password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAuthority('SUPER_ADMIN') or hasAuthority('ADMIN') or hasAuthority('BORROWER')")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN') or hasAuthority('STAFF') or hasAuthority('BORROWER')")
     public void changePassword(@RequestBody @Valid ChangePasswordRequest request) throws Exception {
         authenticationService.changePassword(request);
     }
 
+    @ApiOperation("Forgot password")
     @PostMapping (value="/forgot-password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) throws Exception {
         authenticationService.forgotPassword(request);
     }
 
+    @ApiOperation("Reset password")
     @PostMapping (value="/reset-password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAuthority('SUPER_ADMIN') or hasAuthority('ADMIN') or hasAuthority('BORROWER')")
-    public void resetPassword(@RequestParam String resetPasswordCode) throws Exception {
-        authenticationService.resetPassword(resetPasswordCode);
+    public void resetPassword(@RequestBody @Valid ResetPasswordRequest request, @RequestParam String resetPasswordCode) throws Exception {
+        authenticationService.resetPassword(request,resetPasswordCode);
+    }
+
+    @ApiOperation("Refresh access token")
+    @PostMapping(value = "/token/refresh")
+    public ResponseEntity<RefreshTokenResponse> refreshToken(@RequestHeader(name = HttpHeaders.AUTHORIZATION) String refreshToken) throws Exception {
+        log.debug("POST /authentication/token/refresh {}", refreshToken);
+        RefreshTokenResponse response = authenticationService.refreshToken(refreshToken);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
