@@ -24,6 +24,8 @@ import javax.validation.Valid;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
+import static rentacar.mvp.util.mailUtil.sendEmail;
+
 /**
  * Created by savagaborov on 12.1.2020
  */
@@ -131,14 +133,9 @@ public class AuthenticationService {
         user.get().setResetPasswordCodeTimestamp(ZonedDateTime.now());
         userRepository.save(user.get());
 
-        SimpleMailMessage mail = new SimpleMailMessage();
-        mail.setTo("pajapatak369@gmail.com");
-        mail.setFrom(env.getProperty("spring.mail.username"));
-        mail.setSubject("Forgot password");
-
-        String url="http://localhost:4200/reset-password/" + user.get().getResetPasswordCode();
-        mail.setText("Reset your password by clicking on the link:" + " " + url);
-        javaMailSender.send(mail);
+        String subject = "Forgot password";
+        String body = "Reset your password by clicking on the link: http://localhost:4200/reset-password/" + user.get().getResetPasswordCode();
+        sendEmail(request.getEmail(), subject, body);
 
         log.info("FINISH forgotPassword()");
     }
