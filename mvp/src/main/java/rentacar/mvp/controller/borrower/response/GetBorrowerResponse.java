@@ -1,4 +1,4 @@
-package rentacar.mvp.controller.staff.response;
+package rentacar.mvp.controller.borrower.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -6,12 +6,12 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 /**
- * Created by savagaborov on 20.1.2020
+ * Created by savagaborov on 26.1.2020
  */
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetStaffResponse {
+public class GetBorrowerResponse {
 
     @JsonProperty(value = "id")
     private Long id;

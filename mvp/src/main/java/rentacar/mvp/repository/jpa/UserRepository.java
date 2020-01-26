@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import rentacar.mvp.model.User;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -13,4 +14,6 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long>{
 
     Optional<User> getUserByEmailAndDeletedIsFalse(String email);
+
+    List<User> getUsersByRole(String Role);
 }

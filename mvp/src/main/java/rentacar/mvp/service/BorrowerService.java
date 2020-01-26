@@ -7,40 +7,41 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import rentacar.mvp.controller.borrower.request.CreateBorrowerRequest;
+import rentacar.mvp.controller.borrower.request.EditBorrowerRequest;
+import rentacar.mvp.controller.borrower.response.GetBorrowerResponse;
+import rentacar.mvp.controller.borrower.response.GetBorrowerUsersResponse;
 import rentacar.mvp.controller.exception.RentacarException;
-import rentacar.mvp.controller.staff.request.CreateStaffRequest;
-import rentacar.mvp.controller.staff.request.EditStaffRequest;
-import rentacar.mvp.controller.staff.response.GetStaffResponse;
-import rentacar.mvp.controller.staff.response.GetStaffUsersResponse;
 import rentacar.mvp.enumeration.Role;
 import rentacar.mvp.model.User;
 import rentacar.mvp.repository.jpa.UserRepository;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static rentacar.mvp.controller.Converter.toGetStaffResponse;
+import static rentacar.mvp.controller.Converter.toGetBorrowerResponse;
 
 /**
- * Created by savagaborov on 20.1.2020
+ * Created by savagaborov on 26.1.2020
  */
 @Service
-public class StaffService {
+public class BorrowerService {
 
-    private final Logger log = LoggerFactory.getLogger(StaffService.class);
+    private final Logger log = LoggerFactory.getLogger(BorrowerService.class);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public StaffService(UserRepository userRepository, PasswordEncoder passwordEncoder, JavaMailSender javaMailSender, Environment env){
+    public BorrowerService(UserRepository userRepository, PasswordEncoder passwordEncoder, JavaMailSender javaMailSender, Environment env){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void createStaffUser(CreateStaffRequest request) throws Exception {
-        log.info("START createStaffUser(request: {})", request);
+    public void createBorrowerUser(@Valid CreateBorrowerRequest request) {
+        log.info("START createBorrowerUser(request: {})", request);
 
         Optional<User> existingUser = userRepository.getUserByEmailAndDeletedIsFalse(request.getEmail());
         if (existingUser.isPresent()) {
@@ -52,39 +53,39 @@ public class StaffService {
         user.setLastName(request.getLastName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(Role.STAFF);
+        user.setRole(Role.BORROWER);
         user.setPhoneNumber(request.getPhoneNumber());
         userRepository.save(user);
 
-        log.info("FINISH createStaffUser()");
+        log.info("FINISH createBorrowerUser()");
     }
 
-    public GetStaffUsersResponse getStaffUsers() {
-        log.info("START getStaffUsers()");
+    public GetBorrowerUsersResponse getBorrowerUsers() {
+        log.info("START getBorrowerUsers()");
 
-        List<User> staffUsers = userRepository.getUsersByRole(Role.STAFF.toString());
+        List<User> staffUsers = userRepository.getUsersByRole(Role.BORROWER.toString());
 
-        log.info("START getStaffUsers()");
-        return new GetStaffUsersResponse(staffUsers.stream().map(user -> toGetStaffResponse(user)).collect(Collectors.toList()));
+        log.info("START getBorrowerUsers()");
+        return new GetBorrowerUsersResponse(staffUsers.stream().map(user -> toGetBorrowerResponse(user)).collect(Collectors.toList()));
     }
 
-    public GetStaffResponse getStaffUser(Long staffId) {
-        log.info("START getStaffUser(staffId: {})", staffId);
+    public GetBorrowerResponse getBorrowerUser(Long borrowerId) {
+        log.info("START getBorrowerUser(borrowerId: {})", borrowerId);
 
-        Optional<User> existingUser = userRepository.findById(staffId);
+        Optional<User> existingUser = userRepository.findById(borrowerId);
         if (!existingUser.isPresent()) {
             throw new RentacarException("user.not.exist");
         }
 
-        log.info("FINISH getStaffUser()");
-        return toGetStaffResponse(existingUser.get());
+        log.info("FINISH getBorrowerUser()");
+        return toGetBorrowerResponse(existingUser.get());
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void editStaffUser(Long staffId, EditStaffRequest request) {
-        log.info("START editStaffUser(request: {}, staffId: {})", request, staffId);
+    public void editBorrowerUser(Long borrowerId, @Valid EditBorrowerRequest request) {
+        log.info("START editBorrowerUser(request: {}, borrowerId: {})", request, borrowerId);
 
-        Optional<User> existingUser = userRepository.findById(staffId);
+        Optional<User> existingUser = userRepository.findById(borrowerId);
         if (!existingUser.isPresent()) {
             throw new RentacarException("user.not.exist");
         }
@@ -96,14 +97,14 @@ public class StaffService {
         user.setPhoneNumber(request.getPhoneNumber());
         userRepository.save(user);
 
-        log.info("FINISH editStaffUser()");
+        log.info("FINISH editBorrowerUser()");
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void deleteStaffUser(Long staffId) {
-        log.info("START deleteStaffUser(staffId: {})", staffId);
+    public void deleteBorrowerUser(Long borrowerId) {
+        log.info("START deleteBorrowerUser(borrowerId: {})", borrowerId);
 
-        Optional<User> existingUser = userRepository.findById(staffId);
+        Optional<User> existingUser = userRepository.findById(borrowerId);
         if (!existingUser.isPresent()) {
             throw new RentacarException("user.not.exist");
         }
@@ -112,6 +113,6 @@ public class StaffService {
         user.setDeleted(true);
         userRepository.save(user);
 
-        log.info("FINISH deleteStaffUser()");
+        log.info("FINISH deleteBorrowerUser()");
     }
 }

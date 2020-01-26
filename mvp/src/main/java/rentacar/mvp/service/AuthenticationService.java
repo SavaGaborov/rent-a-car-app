@@ -7,12 +7,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rentacar.mvp.configuration.security.JWTFilter;
-import rentacar.mvp.configuration.security.JWTUtil;
-import rentacar.mvp.controller.authenticate.request.*;
+import rentacar.mvp.controller.authenticate.request.ChangePasswordRequest;
+import rentacar.mvp.controller.authenticate.request.ForgotPasswordRequest;
+import rentacar.mvp.controller.authenticate.request.ResetPasswordRequest;
+import rentacar.mvp.controller.authenticate.request.SignInRequest;
 import rentacar.mvp.controller.authenticate.response.RefreshTokenResponse;
 import rentacar.mvp.controller.authenticate.response.SignInResponse;
 import rentacar.mvp.controller.exception.RentacarException;
@@ -20,7 +23,6 @@ import rentacar.mvp.controller.staff.request.CreateStaffRequest;
 import rentacar.mvp.enumeration.Role;
 import rentacar.mvp.model.User;
 import rentacar.mvp.repository.jpa.UserRepository;
-import org.springframework.mail.javamail.JavaMailSender;
 
 import javax.validation.Valid;
 import java.time.ZonedDateTime;
@@ -61,7 +63,7 @@ public class AuthenticationService {
     }
 
     public SignInResponse signIn(SignInRequest request) throws Exception {
-        log.info("START signIn()");
+        log.info("START signIn(request: {})", request);
 
         Optional<User> user = userRepository.getUserByEmailAndDeletedIsFalse(request.getEmail());
         if (!user.isPresent()) {
@@ -85,7 +87,7 @@ public class AuthenticationService {
     }
 
     public void changePassword(ChangePasswordRequest request) throws Exception {
-        log.info("START changePassword()");
+        log.info("START changePassword(request: {})", request);
 
         Optional<User> user = userRepository.getUserByEmailAndDeletedIsFalse(request.getEmail());
         if (user.isPresent()) {
@@ -103,7 +105,7 @@ public class AuthenticationService {
     }
 
     public void forgotPassword(@Valid ForgotPasswordRequest request) throws Exception {
-        log.info("START forgotPassword()");
+        log.info("START forgotPassword(request: {})", request);
 
         Optional<User> user = userRepository.getUserByEmailAndDeletedIsFalse(request.getEmail());
         if (!user.isPresent()) {
@@ -122,7 +124,7 @@ public class AuthenticationService {
     }
 
     public void resetPassword(ResetPasswordRequest request, String resetPasswordCode) {
-        log.info("START resetPassword()");
+        log.info("START resetPassword(request: {}, resetPasswordCode: {})", request ,resetPasswordCode);
 
         Optional<User> user = userRepository.getUserByEmailAndDeletedIsFalse(request.getEmail());
         if (!user.isPresent()) {
