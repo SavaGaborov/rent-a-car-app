@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import rentacar.mvp.enumeration.CarBrand;
+import rentacar.mvp.enumeration.CarType;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -22,8 +22,9 @@ import javax.validation.constraints.NotNull;
 public class Car extends BaseModel {
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     @Column(name = "brand")
-    private String brand;
+    private CarBrand carBrand;
 
     @NotNull
     @Column(name = "model")
@@ -31,7 +32,7 @@ public class Car extends BaseModel {
 
     @NotNull
     @Column(name = "type")
-    private String type;
+    private CarType carType;
 
     @NotNull
     @Column(name = "registration_number")

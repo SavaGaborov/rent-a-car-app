@@ -24,10 +24,25 @@ CREATE TABLE IF NOT EXISTS cars
     deleted BOOLEAN NOT NULL,
     brand VARCHAR(100) NOT NULL,
     model VARCHAR(100) NOT NULL,
-    type VARCHAR(128) NOT NULL,
+    type VARCHAR(15) NOT NULL,
     registration_number VARCHAR(20) NOT NULL,
     year_built INT NOT NULL,
     available BOOLEAN NOT NULL,
     times_borrowed INT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS rents
+(
+    id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    created_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted BOOLEAN NOT NULL,
+    car_id INT NOT NULL,
+    borrower_id INT NOT NULL,
+    staff_id INT NOT NULL,
+    rentStatus VARCHAR(25) NOT NULL,
+    price DECIMAL,
+    FOREIGN KEY (car_id) REFERENCES cars(id),
+    FOREIGN KEY (borrower_id) REFERENCES users(id),
+    FOREIGN KEY (staff_id) REFERENCES users(id)
+);
