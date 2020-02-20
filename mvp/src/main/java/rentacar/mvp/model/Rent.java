@@ -38,7 +38,7 @@ public class Rent extends BaseModel {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "role")
+    @Column(name = "rent_status")
     private RentStatus rentStatus;
 
     @Column(name = "price")

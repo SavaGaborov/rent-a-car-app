@@ -36,11 +36,11 @@ public class Car extends BaseModel {
 
     @NotNull
     @Column(name = "registration_number")
-    private String registration_number;
+    private String registrationNumber;
 
     @NotNull
     @Column(name = "year_built")
-    private String year_built;
+    private String yearBuilt;
 
     @NotNull
     @Column(name = "available")
@@ -48,5 +48,5 @@ public class Car extends BaseModel {
 
     @NotNull
     @Column(name = "times_borrowed")
-    private Long times_borrowed;
+    private Long timesBorrowed;
 }

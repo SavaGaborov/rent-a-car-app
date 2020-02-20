@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS cars
     registration_number VARCHAR(20) NOT NULL,
     year_built INT NOT NULL,
     available BOOLEAN NOT NULL,
-    times_borrowed INT NOT NULL
+    times_borrowed INT NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS rents
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS rents
     car_id INT NOT NULL,
     borrower_id INT NOT NULL,
     staff_id INT NOT NULL,
-    rentStatus VARCHAR(25) NOT NULL,
+    rent_status VARCHAR(25) NOT NULL,
     price DECIMAL,
     FOREIGN KEY (car_id) REFERENCES cars(id),
     FOREIGN KEY (borrower_id) REFERENCES users(id),

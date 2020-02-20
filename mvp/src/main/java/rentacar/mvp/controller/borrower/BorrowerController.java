@@ -45,7 +45,7 @@ public class BorrowerController {
 
     @ApiOperation(value = "Get borrower user")
     @GetMapping(value="/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('SUPER_ADMIN') or hasAuthority('BORROWER')")
     public ResponseEntity<GetBorrowerResponse> getBorrowerUser(@PathVariable Long id) throws Exception {
         return new ResponseEntity<>(borrowerService.getBorrowerUser(id), HttpStatus.OK);
